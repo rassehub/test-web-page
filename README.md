@@ -24,6 +24,7 @@ docker compose up -d postgres
 npm install
 npm run db:migrate        # apply DB migrations
 npm run bootstrap:admin -- --email you@example.com   # platform admin (prompts for password)
+npm run seed:demo         # idempotent demo salon (/s/demo-salon) for the booking wizard
 npm run dev               # http://localhost:3000
 ```
 

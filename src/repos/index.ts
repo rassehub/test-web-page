@@ -234,13 +234,25 @@ export interface Repos {
 export interface SalonRef {
   id: string;
   slug: string;
+  name: string;
   timezone: string;
+  address: string | null;
+  phone: string | null;
+  email: string | null;
 }
 
 /** Unique slug → salon (public API scope resolution). Null when unknown. */
 export async function findSalonBySlug(db: DrizzleDb, slug: string): Promise<SalonRef | null> {
   const rows = await db
-    .select({ id: salons.id, slug: salons.slug, timezone: salons.timezone })
+    .select({
+      id: salons.id,
+      slug: salons.slug,
+      name: salons.name,
+      timezone: salons.timezone,
+      address: salons.address,
+      phone: salons.phone,
+      email: salons.email,
+    })
     .from(salons)
     .where(eq(salons.slug, slug))
     .limit(1);
@@ -250,11 +262,33 @@ export async function findSalonBySlug(db: DrizzleDb, slug: string): Promise<Salo
 /** Minimal salon read (timezone + scope) for the booking pipeline's day-key. */
 export async function findSalonById(db: DrizzleDb, id: string): Promise<SalonRef | null> {
   const rows = await db
-    .select({ id: salons.id, slug: salons.slug, timezone: salons.timezone })
+    .select({
+      id: salons.id,
+      slug: salons.slug,
+      name: salons.name,
+      timezone: salons.timezone,
+      address: salons.address,
+      phone: salons.phone,
+      email: salons.email,
+    })
     .from(salons)
     .where(eq(salons.id, id))
     .limit(1);
   return rows[0] ?? null;
+}
+
+export interface SalonSummary {
+  id: string;
+  slug: string;
+  name: string;
+}
+
+/** All salons (name + slug) for the public platform index (TASK-301, REQ-001). */
+export async function listSalons(db: DrizzleDb): Promise<SalonSummary[]> {
+  return db
+    .select({ id: salons.id, slug: salons.slug, name: salons.name })
+    .from(salons)
+    .orderBy(salons.name);
 }
 
 // ---------------------------------------------------------------------------

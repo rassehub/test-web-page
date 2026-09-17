@@ -39,7 +39,7 @@ Tasks:
 - TASK-203: ✅ done (user-verified 2026-09-17: 172/172 green, race test 1-winner/19-occupied, REQ-006 threshold flip case green) — [CODE] bookings {types,create,cancel}, slots service wrapper, public slots+bookings routes, @types/luxon. 6 ratifications §14.6(j).
 - TASK-201c: ✅ done (2026-09-17) — [TDD] 4 DST pinning cases (start/end-endpoint skip, both-exist sanity, fall-back early-offset characterization); tests/README refreshed to 176-test inventory. Expect 176/176 at pre-commit run.
 - TASK-204: ✅ done (2026-09-17) — [AUDIT] docs/AUDIT-SPRINT2.md: DoD 1–3 PASS (evidence pointers), 0 blockers; REQ-005/007 → done; REQ-004/006 stay in-progress (HTTP tests → S3, A1 surface → TASK-402); REQ-008/011 → in-progress.
-- TASK-205: [GIT] Commit Sprint 2.
+- TASK-205: ✅ done (2026-09-17) — commit b24c43a (24 files, +3067/−82, secret-scan clean) pushed; origin/main == HEAD. SPRINT 2 CLOSED.
 
 Definition of Done:
 - [ ] All engine unit tests pass incl. DST boundaries, buffer math, fragment blocking
@@ -52,16 +52,20 @@ Definition of Done:
 **Refs:** REQ-001, REQ-004
 
 Tasks:
-- TASK-301: [CODE] Landing page per salon (services, prices, hours), responsive + clean. refs REQ-001
-- TASK-302: [CODE] Booking wizard: salon → service → stylist → slot → contact → confirmation. refs REQ-004
-- TASK-303: [AUDIT] Verify Sprint 3 DoD, report evidence.
+- TASK-300: ✅ done (2026-09-17) — [TDD] 13 specs (catalog routes 4, booking HTTP flow 5, landing render 4); 4 render idiom decisions documented (view seam, plain <a>, notFound digest, fi-FI formats); no new devDeps. Inventory → 189.
+- TASK-301: ✅ code-complete — [CODE] server-only landing (view seam per decision 18, zero client JS), globals.css mobile-first, root salon index, repos listSalons/additive SalonRef, vitest esbuild.jsx wiring. 1 test-line fix (SSR entity escape) ratified post-hoc — TASK-303 verifies not weakened.
+- TASK-302: ✅ code-complete — [CODE] catalog routes (exact DTOs), wizard (5 steps, per-salon TZ display, error mapping 409/422, a11y), styles. Friction: server-side contact validation gap → TASK-302b/c.
+- TASK-302b: ✅ done (2026-09-17) — [TDD] 3 cases (RED no-contact 422 pinning route body {error:"VALIDATION",issues}, phone-only/email-only green pins); harness cleanup-order correction folded (decision 22). Inventory → 192.
+- TASK-302c: ✅ done (2026-09-17) — [CODE] customer refine(phone∨email) via existing zod branch; admin path untouched.
+- TASK-302d: ✅ done (2026-09-17) — [CODE] scripts/seed-demo.mjs (idempotent demo salon+catalog+hours) + seed:demo npm script — unblocks dev walkthrough (index was empty: no human-usable salon-creation path until S4 UI).
+- TASK-303: ✅ done (2026-09-17) — [AUDIT] docs/AUDIT-SPRINT3.md: entity-escape edit upheld (stronger), seed.ts cleanup order proven FK-unique, wizard scope-provenance PASS; REQ-004 → done; REQ-001 → done after user viewport check (360/1440 usable); findings S3-F2/F3 → TASK-701.
 - TASK-304: [GIT] Commit Sprint 3.
 
 Definition of Done:
-- [ ] Lighthouse mobile ≥ 90 on landing
-- [ ] E2E happy path: guest books a slot end-to-end
-- [ ] Invalid slot submission rejected server-side (test)
-- [ ] Committed
+- [x] Lighthouse mobile ≥ 90 on landing (user-verified 2026-09-17)
+- [x] E2E happy path: guest books a slot end-to-end via wizard (user-verified: Demo Salon, confirmation shown; enabled by seed:demo)
+- [x] Invalid slot submission rejected server-side (route-level: STALE_SLOT 409, GAP_FRAGMENT 422, contact validation 422 — 192/192 green)
+- [ ] Committed → TASK-304
 
 ## Sprint 4 — Employee Admin UI
 **Goal:** Calendar tooling and reservation management for staff.

@@ -18,11 +18,15 @@ const bodySchema = z.object({
   serviceId: z.string().uuid(),
   employeeId: z.string().uuid().optional(),
   startsAt: z.string().min(1),
-  customer: z.object({
-    name: z.string().min(1),
-    phone: z.string().optional(),
-    email: z.string().optional(),
-  }),
+  customer: z
+    .object({
+      name: z.string().min(1),
+      phone: z.string().optional(),
+      email: z.string().optional(),
+    })
+    .refine((c) => c.phone !== undefined || c.email !== undefined, {
+      message: "customer requires at least one of phone/email",
+    }),
   notes: z.string().optional(),
 });
 

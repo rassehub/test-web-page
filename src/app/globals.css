@@ -1,0 +1,434 @@
+/*
+ * TASK-301 — public UI styles (salon landing + platform index).
+ * Plain CSS, mobile-first (360–1440px), system fonts, zero assets —
+ * no framework, no client JS, Lighthouse-friendly (REQ-001).
+ */
+
+:root {
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --ink: #1a1d21;
+  --muted: #5b6470;
+  --line: #e3e6ea;
+  --accent: #1450a3;
+  --accent-ink: #ffffff;
+  --radius: 10px;
+  --shadow: 0 1px 3px rgba(16, 24, 40, 0.08);
+  --measure: 44rem;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--bg);
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: var(--ink);
+  line-height: 1.55;
+  -webkit-text-size-adjust: 100%;
+}
+
+main {
+  margin: 0 auto;
+  padding: 1.25rem 1rem 3rem;
+  max-width: var(--measure);
+}
+
+h1 {
+  font-size: 1.75rem;
+  line-height: 1.2;
+  margin: 0 0 0.5rem;
+}
+
+h2 {
+  font-size: 1.15rem;
+  margin: 0 0 0.75rem;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* --- salon landing ------------------------------------------------------- */
+
+.salon-header,
+.salon-section {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.salon-header {
+  padding: 1.5rem 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.salon-contact {
+  font-style: normal;
+  color: var(--muted);
+  display: grid;
+  gap: 0.15rem;
+  margin: 0 0 1.25rem;
+}
+
+.salon-contact a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.salon-contact a:hover,
+.salon-contact a:focus-visible {
+  text-decoration: underline;
+}
+
+.cta {
+  display: inline-block;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+  text-decoration: none;
+  padding: 0.7rem 1.25rem;
+  border-radius: var(--radius);
+}
+
+.cta:hover,
+.cta:focus-visible {
+  filter: brightness(1.1);
+}
+
+.salon-section {
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.service-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.service-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.75rem;
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.75rem 0.9rem;
+}
+
+.service-row:hover,
+.service-row:focus-visible {
+  border-color: var(--accent);
+}
+
+.service-name {
+  font-weight: 600;
+  flex: 1 1 auto;
+}
+
+.service-duration {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.service-price {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.hours-list {
+  margin: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.hours-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.hours-row dt {
+  color: var(--muted);
+}
+
+.hours-row dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- platform index ------------------------------------------------------ */
+
+.index-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.index-list a {
+  display: block;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.index-list a:hover,
+.index-list a:focus-visible {
+  border-color: var(--accent);
+}
+
+.empty-note {
+  color: var(--muted);
+  margin: 0;
+}
+
+/* --- booking wizard (TASK-302) -------------------------------------------- */
+
+.wizard-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.25rem;
+}
+
+.wizard-progress {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin: 0 0 1.25rem;
+  padding: 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.wizard-progress .is-current {
+  color: var(--accent);
+  font-weight: 600;
+  border-bottom: 2px solid var(--accent);
+}
+
+fieldset.wizard-field {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.75rem;
+  align-content: start;
+}
+
+fieldset.wizard-field legend {
+  font-weight: 600;
+  font-size: 1.1rem;
+  padding: 0;
+}
+
+.wizard-options {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.wizard-option {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.75rem 0.9rem;
+  cursor: pointer;
+}
+
+.wizard-option:has(input:checked) {
+  border-color: var(--accent);
+  background: #eef4fc;
+}
+
+.wizard-option-name {
+  font-weight: 600;
+  flex: 1 1 auto;
+}
+
+.wizard-option-meta {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.wizard-label {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.wizard-input {
+  width: 100%;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  font: inherit;
+  background: var(--surface);
+  color: inherit;
+}
+
+.slot-day-heading {
+  font-size: 0.95rem;
+  margin: 0.5rem 0 0;
+  color: var(--muted);
+}
+
+.slot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(5.5rem, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.slot-button {
+  padding: 0.6rem 0.5rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.slot-button:hover {
+  border-color: var(--accent);
+}
+
+.slot-button[aria-pressed="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+
+.wizard-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.btn {
+  display: inline-block;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font: inherit;
+  font-weight: 600;
+  padding: 0.65rem 1.2rem;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.btn:hover:not(:disabled),
+.btn:focus-visible:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--line);
+}
+
+.wizard-note {
+  color: var(--muted);
+  margin: 0;
+}
+
+.wizard-summary {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.wizard-error {
+  color: #b3261e;
+  margin: 0;
+}
+
+.wizard-error-box {
+  border: 1px solid #f3c2bd;
+  background: #fdf1f0;
+  border-radius: var(--radius);
+  padding: 0.75rem 0.9rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.wizard-error-box p {
+  margin: 0;
+  color: #b3261e;
+}
+
+.confirm-list {
+  margin: 0 0 1.25rem;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.confirm-list > div {
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0.5rem;
+}
+
+.confirm-list dt {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.confirm-list dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.confirm-ref {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  word-break: break-all;
+}
+
+/* --- wider viewports ----------------------------------------------------- */
+
+@media (min-width: 48rem) {
+  main {
+    padding-top: 2.5rem;
+  }
+
+  h1 {
+    font-size: 2.25rem;
+  }
+
+  .salon-header {
+    padding: 2rem 1.75rem;
+  }
+
+  .wizard-card {
+    padding: 2rem 1.75rem;
+  }
+}

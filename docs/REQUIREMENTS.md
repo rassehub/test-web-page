@@ -8,10 +8,10 @@ Stack decisions (approved): Next.js + TypeScript · PostgreSQL + Drizzle ORM · 
 
 | ID | Description | Acceptance criteria | Status |
 |----|-------------|---------------------|--------|
-| REQ-001 | Customer landing page per salon: info, services with prices, opening hours; modern, clean, responsive | Given a salon exists, landing renders its service list, prices, hours; Lighthouse mobile performance ≥ 90; usable at 360–1440 px | planned |
+| REQ-001 | Customer landing page per salon: info, services with prices, opening hours; modern, clean, responsive | Given a salon exists, landing renders its service list, prices, hours; Lighthouse mobile performance ≥ 90; usable at 360–1440 px | done |
 | REQ-002 | Admin CRUD for per-salon service catalog: name, duration, buffer time, price, active flag | Owner can create/edit/deactivate services; inactive services never appear in customer flow or slot computation | in-progress |
 | REQ-003 | Admin CRUD for employees per salon: profile, weekly working hours, days off | Working-hours change reflects in slot engine same day; overlapping schedule entries rejected at save | in-progress |
-| REQ-004 | Guest reservation flow: salon → service → stylist (or any) → free slot → name + phone/email → confirmation | Booking persists with status `confirmed`; server rejects stale/invalid slot submissions (409/422) even when client is bypassed | in-progress |
+| REQ-004 | Guest reservation flow: salon → service → stylist (or any) → free slot → name + phone/email → confirmation | Booking persists with status `confirmed`; server rejects stale/invalid slot submissions (409/422) even when client is bypassed | done |
 | REQ-005 | Slot engine: free slots = working hours − bookings − service buffers; Europe/Helsinki, DST-correct | Unit tests cover: DST transition days (March/Oct), buffer application, booked-interval exclusion, multi-stylist calendars | done |
 | REQ-006 | Gap-fragmentation rule: hard block any booking that would leave a residual gap fragment < threshold; threshold is per-salon setting, default 45 min | Test: 3 h gap, mid-gap booking leaving < 45 min fragment → rejected 422; changing threshold changes outcome; admin manual bookings bypass (A1, approved) | in-progress |
 | REQ-007 | Concurrency safety: no double-booking, enforced at DB level | Test: 20 parallel requests for the same slot → exactly 1 succeeds; no orphaned rows | done |

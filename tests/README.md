@@ -1,16 +1,18 @@
-# Test Suite — Sprint 1 + Sprint 2 Status (TASK-103 → TASK-108 → TASK-201 → TASK-201c)
+# Test Suite — Sprint 1 + 2 + 3 Status (TASK-103 → TASK-108 → TASK-201 → TASK-201c → TASK-300)
 
 Specs for the data layer, RBAC, salon-CRUD routes, slot engine, gap rule,
-booking pipeline, and concurrency per
+booking pipeline, concurrency, and the customer HTTP flow per
 [docs/DESIGN.md](../docs/DESIGN.md) §3/§4/§5/§6/§7/§8/§14 and [docs/SPRINTS.md](../docs/SPRINTS.md).
 Sprint 1 specs were authored RED-first (TASK-103), implemented in
 TASK-104/105, remediated in TASK-108. Sprint 2 specs were authored RED-first
 (TASK-201 + TASK-201b) and turned green by TASK-202/203. TASK-201c
 (2026-09-17) is spec-after-ratification remediation (audit findings S2-F1/S2-F7,
 F4 precedent): it pins the §14.6(h) per-endpoint DST skip and the fall-back
-ambiguous-hour early-offset mapping, and refreshed this map.
+ambiguous-hour early-offset mapping, and refreshed this map. TASK-300
+(2026-09-17) specs the Sprint 3 customer face: public catalog routes, the
+end-to-end booking HTTP flow, and the landing render contract.
 
-## Current state (2026-09-17, post TASK-201c)
+## Current state (2026-09-17, post TASK-300)
 
 - User-verified baseline: **172/172 green** (V-UO 2026-09-17; TASK-203 run,
   TASK-204 audit input) — 112 Sprint 1 + **28 pure slot tests** +
@@ -20,6 +22,16 @@ ambiguous-hour early-offset mapping, and refreshed this map.
   suite is now **176 tests** — **32 pure slot** (engine 22 + gap-rule 10) +
   32 integration + 112 Sprint 1. Expected green on the next `npm test`
   (folded into the TASK-205 pre-commit run; pending V-UO).
+- TASK-300 adds **13 Sprint 3 tests** (4 catalog + 5 booking-flow + 4
+  landing): **8 RED at import** (routes + page are TASK-301/302
+  deliverables), **5 green-on-arrival remediation pins** (booking-flow —
+  the S2 routes exist; audit S2 finding: route-level tests were absent).
+  Suite is now **189 tests**. RED until TASK-301/302 land.
+- TASK-302b adds **3 booking-flow tests** (REQ-004 server-side contact
+  validation): **1 RED-first** (customer with neither phone nor email → 422
+  VALIDATION — green only after TASK-302c's zod refinement) + **2 boundary
+  positives** (phone-only / email-only MUST stay 201 — over-tightening guard
+  for TASK-302c; green today). Suite is now **192 tests**.
 
 ### Sprint 1 (user-verified all green, 112/112)
 
@@ -48,6 +60,14 @@ Sprint 2 inventory: **64 tests across 6 files** — **32 PURE** (engine 22 +
 gap-rule 10; always run, no DB, no skipIf gating) + **32 integration**
 (DB-gated describes self-skip until migrations are applied).
 
+### Sprint 3 (TASK-300 + TASK-302b)
+
+| File | State | Tests | Notes |
+|---|---|---|---|
+| `tests/public/catalog-routes.test.ts` | RED (import) | 4 | INTEGRATION (PLAIN): GET `/api/public/salons/[slug]/services` + `/employees` — active-only with exact DTO-key pins, 404 unknown slug, no-auth. Routes are TASK-302 deliverables |
+| `tests/public/booking-flow.test.ts` | 1 RED (TASK-302b) | 8 | INTEGRATION (PLAIN): 5 TASK-300 remediation pins (audit S2: route-level bookings tests absent) — GET slots → POST booking → 201 + DB row/blocked-snapshot/guest-customer asserts; error legs 409 STALE_SLOT / 422 GAP_FRAGMENT{fragmentMinutes} / 404 NOT_FOUND / 422 VALIDATION. Any red there = route drift → [CODE]. +3 TASK-302b (REQ-004 contact validation): name-only customer → 422 VALIDATION (**RED until TASK-302c** zod refinement); phone-only + email-only → 201 boundary pins (must stay green through 302c) |
+| `tests/public/landing.test.ts` | RED (import) | 4 | 3 PURE render-contract tests (`SalonLandingView` via `renderToString`, no DB) + 1 DB-gated unknown-slug `notFound()` digest test (async default export). Page is the TASK-301 deliverable |
+
 ### Red → green register (all green as of 2026-09-17)
 
 | File | RED since | GREEN since |
@@ -58,6 +78,10 @@ gap-rule 10; always run, no DB, no skipIf gating) + **32 integration**
 | `tests/bookings/race.test.ts` | TASK-201 | TASK-203 |
 | `tests/bookings/cancel.test.ts` | TASK-201 (+5 TASK-201b) | TASK-203 |
 | `tests/public/slots-api.test.ts` | TASK-201 | TASK-202/203 |
+| `tests/public/catalog-routes.test.ts` | TASK-300 | TASK-302 |
+| `tests/public/landing.test.ts` | TASK-300 | TASK-301 |
+| `tests/public/booking-flow.test.ts` | TASK-300 (remediation pin, F4 precedent — NOT red-first) | expected green at TASK-300; verified at TASK-301/302 run |
+| `tests/public/booking-flow.test.ts` › TASK-302b no-contact case | TASK-302b | TASK-302c (zod refinement: ≥1 of phone/email) |
 
 Integration specs for `lib/bookings` use **PLAIN mode** (the pipeline owns
 its transactions; an outer test tx would be silently committed) with
@@ -129,6 +153,17 @@ Specs themselves use relative imports and are alias-agnostic. [CONF: HIGH]
 | REQ-008 side (cancel frees slot) + §14.6(e) error matrix | §3.9 partial index, §7 cancel | `cancel.test.ts`: status/cancelled_at set; same interval re-books (2 rows: 1 cancelled + 1 confirmed); BOOKING_CANCELLED after commit (spy sees committed 'cancelled'); TASK-201b: strict error-shape equality (unknown id / already cancelled / cross-salon), cross-salon indistinguishability, idempotent-fail, no notification on error |
 | REQ-011 side (port seam) | §8 | create/cancel spies via `setNotificationPort` (see decisions); failure-isolation specs are TASK-501 scope |
 | REQ-005/012 route surface | §2.3, §6.1 | `slots-api.test.ts`: 200 SlotComputationResult shape (granularity 20, 23 slots, keys, localDate, sorted, Z-suffixed); empty weekday → 200 []; unknown slug/service → 404; cross-salon service → 404; 32-day range → 422 (31 ok); reversed → 422; malformed dates → 422; missing serviceId → 422; no auth |
+
+### Sprint 3
+
+| REQ | AC / Design ref | Tests |
+|---|---|---|
+| REQ-002 "inactive services never appear in customer flow" (route clause) | §2.3 services GET active-only, §3.3 active flag | `catalog-routes.test.ts` › services: 200 exact-DTO active-only (inactive hidden, seeded ids/prices), 404 unknown slug, no auth |
+| REQ-003 (route clause — active employees only) | §2.3 employees GET | `catalog-routes.test.ts` › employees: 200 exact-DTO active-only (title round-trip incl. null), 404 unknown slug, no auth |
+| REQ-001 landing render | §2.1 /s/[slug], §9 page path | `landing.test.ts`: `SalonLandingView` renderToString — salon name + `href="/s/[slug]/book"`; per-service name + fi-FI EUR price; weekday-union labels (present days in, absent day out); unknown slug → default export rejects with `notFound()` digest |
+| REQ-004 happy path (HTTP clause) | §2.3 bookings POST, §6.1, §7, §3.9 | `booking-flow.test.ts` › happy: GET slots → first slot → POST 201 `{bookingId, status:'confirmed'}` + DB row (exact duration, blocked_* snapshot, created_via 'customer') + guest customer row by phone; no auth |
+| REQ-004 "server rejects stale/invalid slot submissions (409/422)" (route clause) | §7 + §14.6 error table | `booking-flow.test.ts` › error legs: misaligned startsAt → 409 `{code:'STALE_SLOT'}`; gap-fragment candidate → 422 `{code:'GAP_FRAGMENT',fragmentMinutes:20}` (busy 11–12 + 12:20 candidate, threshold 45 — REQ-006 hard block on customer path); unknown service uuid → 404 `{code:'NOT_FOUND'}`; missing customer.name → 422 VALIDATION |
+| REQ-004 "name + phone/email" (server-authoritative contact clause) | §9 zod boundary, §7 §14.6(f) guest identity | `booking-flow.test.ts` › TASK-302b: customer with name only (no phone/email) → 422 VALIDATION — server rejects even when the wizard's client gate is bypassed; phone-only & email-only → 201 stay-legal pins (over-tightening guard for TASK-302c) |
 
 ## Documented decisions & flagged gaps
 
@@ -216,3 +251,49 @@ Specs themselves use relative imports and are alias-agnostic. [CONF: HIGH]
     Luxon default); this is a characterization pin, not a §14.6
     ratification. [CONF: HIGH] [SRC: DOC — Luxon resolves ambiguous wall
     times to the earlier offset; engine inspected 2026-09-17]
+
+### Sprint 3 (TASK-300) — catalog DTO pins + landing render seam
+
+18. **Catalog DTO keys (SPEC DECISION, needs CODE adherence)**: DESIGN §2.3
+    names the catalog routes but no response shape. Pinned (exact-key,
+    slots-api precedent): services item `{ id, name, durationMinutes,
+    priceCents }`; employees item `{ id, displayName, title }` with
+    `title: string | null`. No buffers/timestamps/active flag — the customer
+    flow needs pick-list fields only. [CONF: MED] [SRC: INFERENCE from §2.3
+    + §14.6(2) camelCase rule]
+19. **Landing render seam (SPEC DECISION, needs CODE adherence)**:
+    `src/app/(public)/s/[slug]/page.tsx` must export a default async Next 15
+    page AND a named SYNCHRONOUS `SalonLandingView({ salon, services,
+    workingHours })`. The view must render via `renderToString` outside any
+    Next request context — hence a plain `<a href>` for the book link, NOT
+    `next/link` (Link throws without app-router context). A re-export from a
+    co-located view file satisfies the fixed import path. [CONF: MED]
+    [SRC: INFERENCE — react-dom/server cannot host Next client-link context;
+    sync components cannot be awaited by renderToString]
+20. **notFound idiom (choice per TASK-300 brief)**: unknown slug asserted via
+    the thrown `notFound()` digest `"NEXT_HTTP_ERROR_FALLBACK;404"`. The
+    implementer MUST produce it by calling `notFound()` from
+    `next/navigation` — never hand-throw a matching error. [CONF: MED]
+    [SRC: DOC — Next.js internal error-digest contract]
+21. **Render format pins (binding for TASK-301)**: prices via
+    `Intl.NumberFormat("fi-FI", { style: "currency", currency: "EUR" })
+    .format(priceCents / 100)` (integer cents → e.g. "45,00 €"); weekday
+    labels via `Intl.DateTimeFormat("en", { weekday: "long" })` (i18n out of
+    scope per §10). No new devDependency: `react`/`react-dom` are runtime
+    deps and ship `react-dom/server`; specs stay `.ts` + `createElement`
+    because vitest only includes `.test.ts` files.
+22. **Contact-channel VALIDATION body shape (PINNED, binding for TASK-302c)**:
+    REQ-004's "name + phone/email" is enforced at the zod HTTP boundary. The
+    422 body is the route's EXISTING zod shape `{error:"VALIDATION",
+    issues:[…non-empty]}` (mirrors the missing-name pin) — NOT the pipeline
+    BookingError `{code:"VALIDATION",field}` (reserved for pipeline-detected
+    invalidity, e.g. unparseable startsAt). TASK-302c must implement
+    ≥1-of(phone,email) as a zod refinement on the bookings route; a
+    pipeline-level `{code:"VALIDATION",field:"customer"}` return fails this
+    pin by design. Harness correction folded into TASK-302b: guest-customer
+    deletion moved AFTER `Seeder.cleanup()` (salon cascade removes bookings
+    first — §3.9 customer FK is NO ACTION; create/race/cancel precedent —
+    the previous customers-first order would raise 23503 on any test that
+    creates a booking), and tracked keys extended to email plus (RED-phase
+    unkeyed rows) UUID-suffixed name. [CONF: HIGH] [SRC: DOC — bookings
+    route zod branch + §3.9 DDL; SPRINTS.md TASK-302c mandate]
