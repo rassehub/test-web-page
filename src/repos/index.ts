@@ -18,6 +18,7 @@ import {
   bookings,
   employees,
   salonSettings,
+  salons,
   services,
   timeOff,
   workingHours,
@@ -222,6 +223,38 @@ export interface Repos {
   timeOff: TimeOffRepo;
   bookings: BookingsRepo;
   settings: SettingsRepo;
+}
+
+// ---------------------------------------------------------------------------
+// Platform-level salon lookup — deliberately OUTSIDE createRepos (§4): a repo
+// instance IS a salon scope, and public callers resolve that scope from the
+// unique slug (§2.3 rule). Mirrors the salon-CRUD route's direct table access.
+// ---------------------------------------------------------------------------
+
+export interface SalonRef {
+  id: string;
+  slug: string;
+  timezone: string;
+}
+
+/** Unique slug → salon (public API scope resolution). Null when unknown. */
+export async function findSalonBySlug(db: DrizzleDb, slug: string): Promise<SalonRef | null> {
+  const rows = await db
+    .select({ id: salons.id, slug: salons.slug, timezone: salons.timezone })
+    .from(salons)
+    .where(eq(salons.slug, slug))
+    .limit(1);
+  return rows[0] ?? null;
+}
+
+/** Minimal salon read (timezone + scope) for the booking pipeline's day-key. */
+export async function findSalonById(db: DrizzleDb, id: string): Promise<SalonRef | null> {
+  const rows = await db
+    .select({ id: salons.id, slug: salons.slug, timezone: salons.timezone })
+    .from(salons)
+    .where(eq(salons.id, id))
+    .limit(1);
+  return rows[0] ?? null;
 }
 
 // ---------------------------------------------------------------------------

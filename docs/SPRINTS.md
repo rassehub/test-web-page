@@ -33,10 +33,12 @@ Definition of Done:
 **Refs:** REQ-004, REQ-005, REQ-006, REQ-007
 
 Tasks:
-- TASK-201: [TDD] Spec slot engine per DESIGN §6.1–§6.3: availability math, DST cases, buffers, gap-fragmentation hard block, concurrency race. refs REQ-005, REQ-006, REQ-007
-- TASK-202: [CODE] Implement slot engine + gap rule (threshold from salon settings). refs REQ-005, REQ-006
-- TASK-203: [CODE] Implement booking creation pipeline per DESIGN §7 (public + admin bypass A1, advisory lock, 23P01→409). refs REQ-004, REQ-006, REQ-007
-- TASK-204: [AUDIT] Verify Sprint 2 DoD, report evidence.
+- TASK-201: ✅ done (2026-09-17) — [TDD] 6 files, 55 red tests (engine 18, gap-rule 10, create 12, race 2, cancel 3, slots-api 10); notification seam decided (setNotificationPort); 6 ambiguities routed → ratified DESIGN §14.6.
+- TASK-201b: ✅ done (2026-09-17) — [TDD] 5 cancel error-path cases (strict error-shape equality, cross-salon indistinguishability, idempotent-fail, no-notification-on-error). Sprint 2 spec phase: 60 red tests across 7 files.
+- TASK-202: ✅ done (172/172 green incl. 28 pure slot tests) — [CODE] types/engine/gapRule/port per §6/§14.6; ratifications §14.6(h)(i).
+- TASK-203: ✅ done (user-verified 2026-09-17: 172/172 green, race test 1-winner/19-occupied, REQ-006 threshold flip case green) — [CODE] bookings {types,create,cancel}, slots service wrapper, public slots+bookings routes, @types/luxon. 6 ratifications §14.6(j).
+- TASK-201c: ✅ done (2026-09-17) — [TDD] 4 DST pinning cases (start/end-endpoint skip, both-exist sanity, fall-back early-offset characterization); tests/README refreshed to 176-test inventory. Expect 176/176 at pre-commit run.
+- TASK-204: ✅ done (2026-09-17) — [AUDIT] docs/AUDIT-SPRINT2.md: DoD 1–3 PASS (evidence pointers), 0 blockers; REQ-005/007 → done; REQ-004/006 stay in-progress (HTTP tests → S3, A1 surface → TASK-402); REQ-008/011 → in-progress.
 - TASK-205: [GIT] Commit Sprint 2.
 
 Definition of Done:
@@ -136,3 +138,4 @@ Definition of Done:
 - 2026-09-17 TASK-105 code-complete — auth + salon CRUD on disk. Sprint 1 implementation phase ends; TASK-106 audit requires user-executed runtime evidence (no shell in any sub-agent session).
 - 2026-09-17 User runtime evidence: install + compose + migrate + full test suite ALL GREEN (user terminal).
 - 2026-09-17 TASK-106 audit done → docs/AUDIT-SPRINT1.md. Dispositions: F1 DoD reworded (ledger defect); F3 resolved — route split stands as built (salon routes S1, remaining admin routes S4); F2/F4/F5/F7/F10 → TASK-108/109; REQ-002/003/009/012 → in-progress. Sprint close pending: remediation + health curl + TASK-107.
+- 2026-09-17 SPRINT 1 CLOSED — final user verification all green (tests, bootstrap, login flow, health); TASK-108/109 done; commits 079e8da + 66c6dfd (48 files, +9794; suite 112/112 green pre-commit; .env/node_modules excluded; unpushed). REQ-009, REQ-012 → done.
